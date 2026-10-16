@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Autorizações · Equilíbrio Gestão da Clínica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='12' cy='16' r='9' fill='%233f4fb5'/%3E%3Ccircle cx='20' cy='16' r='9' fill='%2379c2b4' fill-opacity='.85'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --marca: #3f4fb5; --marca-escura: #2f3c92; --fundo: #f4f5fa; --cartao: #fff; --texto: #1c2033;
+    --suave: #646b85; --linha: #dfe2ee; --ok: #177a4b; --ok-fundo: #e6f5ec; --alerta: #9a5800;
+    --alerta-fundo: #fff2db; --espera: #4a5578; --espera-fundo: #eceef6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--fundo); color: var(--texto); font: 17px/1.5 "Nunito Sans", "Segoe UI", Roboto, Arial, sans-serif; }
+  .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  nav { background: #1f2547; color: #cdd2ea; padding: 22px 16px; }
+  nav .marca { display: flex; align-items: center; gap: 10px; color: #fff; margin: 0 6px 28px; }
+  nav .marca strong { display: block; font-size: 20px; line-height: 1.1; }
+  nav .marca small { display: block; font-size: 12.5px; color: #aab1d6; }
+  nav ul { list-style: none; margin: 0; padding: 0; }
+  nav li { padding: 9px 12px; border-radius: 9px; margin-bottom: 4px; font-weight: 600; }
+  nav li[aria-current] { background: var(--marca); color: #fff; }
+  nav li[aria-disabled] { opacity: 0.6; }
+  .principal { display: flex; flex-direction: column; min-width: 0; }
+  .barra { display: flex; align-items: center; padding: 14px 32px; background: #fff; border-bottom: 1px solid var(--linha); font-size: 15px; color: var(--suave); }
+  .barra .usuario { margin-left: auto; }
+  main { flex: 1; padding: 26px 32px 32px; max-width: 1080px; width: 100%; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--suave); margin: 0 0 20px; }
+  .resumo { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
+  .resumo div { background: #fff; border: 1px solid var(--linha); border-radius: 12px; padding: 10px 18px; font-weight: 700; }
+  .resumo b { font-size: 22px; margin-right: 6px; }
+  .resumo .atencao { border-color: #f1d49c; background: var(--alerta-fundo); color: var(--alerta); }
+  .paciente { background: var(--cartao); border: 1px solid var(--linha); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; }
+  .paciente.atencao { border: 2px solid #e8a33a; background: #fffaf0; }
+  .cab { display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; background: #e3e6f7; color: var(--marca); display: grid; place-items: center; font-weight: 800; flex: none; }
+  .nome { font-size: 19px; font-weight: 800; }
+  .conv { color: var(--suave); font-size: 15px; }
+  .chip { margin-left: auto; border-radius: 999px; padding: 4px 12px; font-size: 14px; font-weight: 800; white-space: nowrap; }
+  .chip.espera { background: var(--espera-fundo); color: var(--espera); }
+  .chip.ok { background: var(--ok-fundo); color: var(--ok); }
+  .chip.alerta { background: var(--alerta-fundo); color: var(--alerta); }
+  .info { margin: 10px 0 0 58px; color: var(--texto); }
+  .info span + span::before { content: "·"; margin: 0 8px; color: var(--suave); }
+  .registro { margin: 14px 0 0 58px; display: grid; grid-template-columns: 200px 1fr auto auto; gap: 12px; align-items: end; }
+  .registro label { display: block; font-size: 14px; font-weight: 700; color: var(--suave); margin-bottom: 4px; }
+  input, select { width: 100%; font: inherit; padding: 9px 12px; border: 1px solid #bcc2d8; border-radius: 9px; background: #fff; color: var(--texto); }
+  input:focus, select:focus { outline: 3px solid rgba(63, 79, 181, 0.25); border-color: var(--marca); }
+  button { font: inherit; font-weight: 700; border-radius: 9px; cursor: pointer; }
+  .salvar { background: var(--marca); color: #fff; border: 0; padding: 10px 20px; }
+  .salvar:hover { background: var(--marca-escura); }
+  .pendencia { background: #fff; color: var(--alerta); border: 1px solid #e0a64a; padding: 9px 16px; }
+  .feito { margin: 12px 0 0 58px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+  .feito .num { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .feito .obs { color: var(--alerta); font-weight: 700; }
+  .feito .quando { color: var(--suave); font-size: 14px; }
+  .feito .editar { background: none; border: 0; color: var(--marca); text-decoration: underline; padding: 0; font-weight: 600; font-size: 14px; }
+  .bandeira { display: inline-block; background: #e8a33a; color: #fff; border-radius: 6px; padding: 1px 8px; font-size: 13px; font-weight: 800; margin-left: 8px; vertical-align: 2px; }
+  .rodape { text-align: center; color: var(--suave); font-size: 13px; padding: 16px; border-top: 1px solid var(--linha); }
+  .rodape button { background: none; border: 0; color: var(--suave); text-decoration: underline; font-weight: 400; font-size: 13px; padding: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav aria-label="Menu">
+    <div class="marca">
+      <svg width="36" height="36" viewBox="0 0 32 32" aria-hidden="true"><circle cx="12" cy="16" r="9" fill="#6f7ee0"/><circle cx="20" cy="16" r="9" fill="#79c2b4" fill-opacity=".85"/></svg>
+      <div><strong>Equilíbrio</strong><small>Gestão da Clínica</small></div>
+    </div>
+    <ul>
+      <li aria-disabled="true">Agenda</li>
+      <li aria-disabled="true">Pacientes</li>
+      <li aria-current="page">Autorizações</li>
+      <li aria-disabled="true">Financeiro</li>
+    </ul>
+  </nav>
+  <div class="principal">
+    <div class="barra"><span>Clínica Equilíbrio · Fisioterapia</span><span class="usuario">Recepção</span></div>
+    <main>
+      <h1>Autorizações de convênio</h1>
+      <p class="sub">Tratamentos da próxima semana que dependem de autorização do plano.</p>
+      <div class="resumo" id="resumo" aria-label="Resumo"></div>
+      <div id="lista"></div>
+    </main>
+    <footer class="rodape">Ambiente de demonstração · sistema e dados fictícios · <button type="button" onclick="reiniciar()">Reiniciar demonstração</button></footer>
+  </div>
+</div>
+<script>
+// Equilíbrio — sistema de clínica FICTÍCIO, só para demonstração. Estado no localStorage.
+const CHAVE = 'equilibrio.v1';
+const SITUACOES = ['Aguardando autorização', 'Autorizada', 'Pendente no convênio', 'Negada'];
+function proximaSegunda() { const d = new Date(); d.setHours(12); do { d.setDate(d.getDate() + 1); } while (d.getDay() !== 1); return d; }
+function dia(n) {
+  const d = proximaSegunda(); d.setDate(d.getDate() + n);
+  return d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '') + ', ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+function inicial() {
+  const passada = new Date(); passada.setDate(passada.getDate() - 6);
+  return { pacientes: [
+    { id: 'p1', nome: 'Mariana Alves Duarte', cart: '0042 1187 3305 01', proc: 'Fisioterapia ortopédica', sessoes: 10, inicio: dia(0), situacao: SITUACOES[0], numero: '', obs: '' },
+    { id: 'p2', nome: 'João Pedro Ramos', cart: '0042 5520 9418 02', proc: 'Fisioterapia neurológica', sessoes: 8, inicio: dia(1), situacao: SITUACOES[0], numero: '', obs: '' },
+    { id: 'p3', nome: 'Helena Costa Prado', cart: '0042 3076 6612 01', proc: 'RPG — reeducação postural global', sessoes: 20, inicio: dia(2), situacao: SITUACOES[0], numero: '', obs: '' },
+    { id: 'p4', nome: 'Beatriz Nogueira', cart: '0042 7741 2088 03', proc: 'Pilates clínico', sessoes: 10, inicio: dia(3), situacao: SITUACOES[1], numero: '2026-310774', obs: '',
+      quando: passada.toLocaleDateString('pt-BR') },
+  ] };
+}
+if (new URLSearchParams(location.search).has('reset')) {
+  try { localStorage.removeItem(CHAVE); localStorage.removeItem('lumora.v1'); } catch (e) {}
+  history.replaceState(null, '', location.pathname);
+}
+function estado() { try { return JSON.parse(localStorage.getItem(CHAVE)) || inicial(); } catch (e) { return inicial(); } }
+function grava(s) { try { localStorage.setItem(CHAVE, JSON.stringify(s)); } catch (e) {} }
+function reiniciar() { try { localStorage.removeItem(CHAVE); localStorage.removeItem('lumora.v1'); } catch (e) {} location.reload(); }
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const iniciais = n => n.split(' ').filter((p, i, a) => i === 0 || i === a.length - 1).map(p => p[0]).join('');
+const classe = s => s === 'Autorizada' ? 'ok' : s === 'Aguardando autorização' ? 'espera' : 'alerta';
+const editando = new Set();
+
+function desenha() {
+  const s = estado(); const ps = s.pacientes;
+  const n = k => ps.filter(p => classe(p.situacao) === k).length;
+  document.getElementById('resumo').innerHTML =
+    `<div><b>${n('espera')}</b>aguardando autorização</div><div><b>${n('ok')}</b>autorizadas</div>` +
+    (n('alerta') ? `<div class="atencao"><b>${n('alerta')}</b>precisa de atenção</div>` : '');
+  document.getElementById('lista').innerHTML = ps.map(p => {
+    const c = classe(p.situacao); const aberto = c === 'espera' || editando.has(p.id); const nm = esc(p.nome);
+    const cab = `<div class="cab"><div class="avatar" aria-hidden="true">${iniciais(p.nome)}</div><div><div class="nome">${nm}` +
+      (c === 'alerta' ? '<span class="bandeira">Precisa de atenção</span>' : '') +
+      `</div><div class="conv">Lumora Saúde · carteirinha ${p.cart}</div></div><span class="chip ${c}">${esc(p.situacao)}</span></div>` +
+      `<div class="info"><span>${esc(p.proc)}</span><span>${p.sessoes} sessões</span><span>início ${p.inicio}</span></div>`;
+    const corpo = aberto
+      ? `<form class="registro" data-id="${p.id}">
+           <div><label for="num-${p.id}">Nº da autorização</label><input id="num-${p.id}" name="numero" value="${esc(p.numero)}" aria-label="Nº da autorização de ${nm}" autocomplete="off"></div>
+           
+           <div><label for="obs-${p.id}">Observação</label><input id="obs-${p.id}" name="obs" value="${esc(p.obs)}" aria-label="Observação de ${nm}" autocomplete="off"></div>
+           <button class="salvar" type="submit" name="acao" value="Autorizada" aria-label="Registrar autorização de ${nm}">Registrar autorização</button>
+           <button class="pendencia" type="submit" name="acao" value="Pendente no convênio" aria-label="Registrar pendência de ${nm}">Registrar pendência</button>
+         </form>`
+      : `<div class="feito">${p.numero ? `<span>${c === 'alerta' ? 'Protocolo' : 'Nº'} <span class="num">${esc(p.numero)}</span></span>` : ''}` +
+        (p.obs ? `<span class="obs">${esc(p.obs)}</span>` : '') +
+        `<span class="quando">registrado ${p.quando && !p.quando.includes(':') ? 'em ' + p.quando : 'hoje às ' + (p.quando || '')}</span>` +
+        `<button class="editar" type="button" data-editar="${p.id}" aria-label="Editar autorização de ${nm}">Editar</button></div>`;
+    return `<article class="paciente${c === 'alerta' ? ' atencao' : ''}" aria-label="${nm}">${cab}${corpo}</article>`;
+  }).join('');
+}
+document.addEventListener('submit', ev => {
+  const f = ev.target.closest('form.registro'); if (!f) return; ev.preventDefault();
+  const s = estado(); const p = s.pacientes.find(x => x.id === f.dataset.id);
+  p.numero = f.numero.value.trim(); p.obs = f.obs.value.trim();
+  p.situacao = (ev.submitter && ev.submitter.value) || 'Autorizada';
+  p.quando = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  grava(s); editando.delete(p.id); desenha();
+});
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-editar]'); if (!b) return; editando.add(b.dataset.editar); desenha();
+});
+desenha();
+</script>
+</body>
+</html>
