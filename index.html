@@ -90,7 +90,7 @@
       <div class="resumo" id="resumo" aria-label="Resumo"></div>
       <div id="lista"></div>
     </main>
-    <footer class="rodape">Ambiente de demonstração · sistema e dados fictícios · v2 · <button type="button" onclick="reiniciar()">Reiniciar demonstração</button></footer>
+    <footer class="rodape">Ambiente de demonstração · sistema e dados fictícios · v3 · <button type="button" onclick="reiniciar()">Reiniciar demonstração</button></footer>
   </div>
 </div>
 <script>
@@ -100,7 +100,7 @@ const SITUACOES = ['Aguardando autorização', 'Autorizada', 'Pendente no convê
 function proximaSegunda() { const d = new Date(); d.setHours(12); do { d.setDate(d.getDate() + 1); } while (d.getDay() !== 1); return d; }
 function dia(n) {
   const d = proximaSegunda(); d.setDate(d.getDate() + n);
-  return d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '') + ', ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  return d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'short' }).replace('.', '') + ', ' + d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' });
 }
 function inicial() {
   const passada = new Date(); passada.setDate(passada.getDate() - 6);
@@ -109,7 +109,7 @@ function inicial() {
     { id: 'p2', nome: 'João Pedro Ramos', cart: '0042 5520 9418 02', proc: 'Fisioterapia neurológica', sessoes: 8, inicio: dia(1), situacao: SITUACOES[0], numero: '', obs: '' },
     { id: 'p3', nome: 'Helena Costa Prado', cart: '0042 3076 6612 01', proc: 'RPG — reeducação postural global', sessoes: 20, inicio: dia(2), situacao: SITUACOES[0], numero: '', obs: '' },
     { id: 'p4', nome: 'Beatriz Nogueira', cart: '0042 7741 2088 03', proc: 'Pilates clínico', sessoes: 10, inicio: dia(3), situacao: SITUACOES[1], numero: '2026-310774', obs: '',
-      quando: passada.toLocaleDateString('pt-BR') },
+      quando: passada.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) },
   ] };
 }
 if (new URLSearchParams(location.search).has('reset')) {
@@ -169,7 +169,7 @@ document.addEventListener('submit', ev => {
   }
   p.numero = f.numero.value.trim(); p.obs = f.obs.value.trim();
   p.situacao = acao;
-  p.quando = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  p.quando = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
   grava(s); editando.delete(p.id); desenha();
 });
 document.addEventListener('click', ev => {
