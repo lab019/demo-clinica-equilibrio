@@ -49,6 +49,8 @@
   .info { margin: 10px 0 0 58px; color: var(--texto); }
   .info span + span::before { content: "·"; margin: 0 8px; color: var(--suave); }
   .registro { margin: 14px 0 0 58px; display: grid; grid-template-columns: 200px 1fr auto auto; gap: 12px; align-items: end; }
+  .registro .aviso { grid-column: 1 / -1; color: #b42318; font-size: 14px; font-weight: 600; }
+  .registro .aviso:empty { display: none; }
   .registro label { display: block; font-size: 14px; font-weight: 700; color: var(--suave); margin-bottom: 4px; }
   input, select { width: 100%; font: inherit; padding: 9px 12px; border: 1px solid #bcc2d8; border-radius: 9px; background: #fff; color: var(--texto); }
   input:focus, select:focus { outline: 3px solid rgba(63, 79, 181, 0.25); border-color: var(--marca); }
@@ -88,7 +90,7 @@
       <div class="resumo" id="resumo" aria-label="Resumo"></div>
       <div id="lista"></div>
     </main>
-    <footer class="rodape">Ambiente de demonstração · sistema e dados fictícios · <button type="button" onclick="reiniciar()">Reiniciar demonstração</button></footer>
+    <footer class="rodape">Ambiente de demonstração · sistema e dados fictícios · v2 · <button type="button" onclick="reiniciar()">Reiniciar demonstração</button></footer>
   </div>
 </div>
 <script>
@@ -141,6 +143,7 @@ function desenha() {
            <div><label for="obs-${p.id}">Observação</label><input id="obs-${p.id}" name="obs" value="${esc(p.obs)}" aria-label="Observação de ${nm}" autocomplete="off"></div>
            <button class="salvar" type="submit" name="acao" value="Autorizada" aria-label="Registrar autorização de ${nm}">Registrar autorização</button>
            <button class="pendencia" type="submit" name="acao" value="Pendente no convênio" aria-label="Registrar pendência de ${nm}">Registrar pendência</button>
+           <div class="aviso" role="alert"></div>
          </form>`
       : `<div class="feito">${p.numero ? `<span>${c === 'alerta' ? 'Protocolo' : 'Nº'} <span class="num">${esc(p.numero)}</span></span>` : ''}` +
         (p.obs ? `<span class="obs">${esc(p.obs)}</span>` : '') +
@@ -149,11 +152,23 @@ function desenha() {
     return `<article class="paciente${c === 'alerta' ? ' atencao' : ''}" aria-label="${nm}">${cab}${corpo}</article>`;
   }).join('');
 }
+// O navegador automatizado pode recarregar a página entre uma ação e outra (preencher, clicar):
+// o que já foi digitado fica guardado na hora e volta quando a página recarrega.
+document.addEventListener('input', ev => {
+  const f = ev.target.closest('form.registro'); if (!f || !['numero', 'obs'].includes(ev.target.name)) return;
+  const s = estado(); const p = s.pacientes.find(x => x.id === f.dataset.id);
+  p[ev.target.name] = ev.target.value; grava(s);
+});
 document.addEventListener('submit', ev => {
   const f = ev.target.closest('form.registro'); if (!f) return; ev.preventDefault();
   const s = estado(); const p = s.pacientes.find(x => x.id === f.dataset.id);
+  const acao = (ev.submitter && ev.submitter.value) || 'Autorizada';
+  if (!f.numero.value.trim()) {
+    f.querySelector('.aviso').textContent = acao === 'Autorizada' ? 'Informe o número da autorização.' : 'Informe o protocolo do convênio.';
+    return;
+  }
   p.numero = f.numero.value.trim(); p.obs = f.obs.value.trim();
-  p.situacao = (ev.submitter && ev.submitter.value) || 'Autorizada';
+  p.situacao = acao;
   p.quando = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   grava(s); editando.delete(p.id); desenha();
 });
